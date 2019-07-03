@@ -1,7 +1,0 @@
-\beamer@sectionintoc {1}{Introduction to Fortran}{3}{0}{1}
-\beamer@subsectionintoc {1}{1}{Getting a feel for fortran}{3}{0}{1}
-\beamer@subsectionintoc {1}{2}{Let's get started}{6}{0}{1}
-\beamer@sectionintoc {2}{Numerical Computation}{7}{0}{2}
-\beamer@subsectionintoc {2}{1}{Roots of Functions}{7}{0}{2}
-\beamer@subsectionintoc {2}{2}{Solution of Linear System Equation}{9}{0}{2}
-\beamer@subsectionintoc {2}{3}{Numerical Differentiation}{13}{0}{2}
