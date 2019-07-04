@@ -4,7 +4,7 @@
 gfortran -o integrasi.out integrasi.f95
 
 #run compilation file
-./test.out
+./integrasi.out
 
 #remove compilation file
-rm -rf test.out
+rm -rf *.out

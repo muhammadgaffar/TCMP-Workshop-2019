@@ -7,21 +7,21 @@
 program main
   
   implicit none
-  integer :: nData,i,nx,iData
-  double precision, allocatable :: x(:),y(:),approxIntg(:),error(:)
-  double precision :: xmin,xmax,dx,exact
-  double precision, external :: polinomial, intgPolinomial
+  integer 			:: nData,i,nx,iData
+  double precision, allocatable :: x(:),y(:),wLgr(:),approxIntg(:),error(:)
+  double precision 		:: xmin,xmax,dx,exact
+  double precision, external 	:: polinomial, intgPolinomial
 
-  !plot data polinimial p(x) = 2.5x^2 - x - 10
-  nData = 100
-  xmin = 0.d0
-  xmax = 12.d0
-  dx = (xmax - xmin) / (nData-1)
+  !plot data polinimial p(x) = x^4  + 5x^3 - 25x
+  nData	= 100
+  xmin 	= -3.d0
+  xmax 	= 2.d0
+  dx 	= (xmax - xmin) / (nData-1)
   
   allocate(x(nData))
   allocate(y(nData))
 
-  open(unit = 1, file="polinimial.dat",status="unknown")
+  open(unit=1,file="polinimial.dat",status="unknown")
   do i = 1,nData
     x(i) = xmin + (i-1)*dx
     y(i) = polinomial(x(i))
@@ -36,10 +36,10 @@ program main
  !hasil integasi analitik eksak dari p(x) dari xmin -> xmax
  exact = intgPolinomial(xmax) - intgPolinomial(xmin)
 
- !hasil integrasi numerik dari p(x) dari xmin -> xmax dengan variasi banyak Data
- open(unit = 2, file="compareIntg.dat",status="unknown")
+ !hasil integrasi numerik trapezoid
+ open(unit=2,file="compareTrapz.dat",status="unknown")
  !variasi banyak data dari 10 -> 100 dg interval 10
- do iData = 10,100,10
+ do iData = 5,55,10
 
     allocate(x(iData))
     allocate(y(iData))
@@ -56,7 +56,7 @@ program main
     end do
 
     !integrasi numerik
-    call integrasi(iData,y,x,approxIntg(iData))
+    call trapz(iData,y,x,approxIntg(iData))
 
     !error dari nilai eksak = | (numerik - eksak) / eksak |
     error(iData) = abs( ( approxIntg(iData) - exact ) / exact )
@@ -71,6 +71,41 @@ program main
  end do
  close(2)
 
+ !hasil integrasi numerik simpson
+ open(unit=3,file="compareSimspson.dat",status="unknown")
+ !variasi banyak data dari 10 -> 100 dg interval 10
+ do iData = 5,55,10
+
+    allocate(x(iData))
+    allocate(y(iData))
+    allocate(approxIntg(iData))
+    allocate(error(iData))
+
+    xmin = 0.d0
+    xmax = 12.d0
+    dx = (xmax - xmin) / (iData-1)
+
+    do i = 1,iData
+       x(i) = xmin + (i-1)*dx
+       y(i) = polinomial(x(i))    
+    end do
+
+    !integrasi numerik
+    call simpson(iData,y,x,approxIntg(iData))
+
+    !error dari nilai eksak = | (numerik - eksak) / eksak |
+    error(iData) = abs( ( approxIntg(iData) - exact ) / exact )
+
+    write(3,*) iData, exact, approxIntg(iData), error(iData)
+
+    deallocate(x)
+    deallocate(y)
+    deallocate(approxIntg)
+    deallocate(error)
+    
+ end do
+ close(3)
+
 end program main
 
 !fungsi polinomial
@@ -78,7 +113,7 @@ function polinomial(x) result(y)
   double precision, intent(in) :: x
   double precision :: y
 
-  y = 2.5*x**3 - x - 10
+  y = x**4 + 5*x**3 - 25*x
   
 end function polinomial
 
@@ -87,20 +122,19 @@ function intgPolinomial(x) result(y)
   double precision, intent(in) :: x
   double precision :: y
 
-  y = 2.5*x**4 / 4 - x**2 / 2 - 10*x
+  y = x**5 / 5 + 5*x**4 / 4 - 12.5*x**2
   
 end function intgPolinomial
 
 !integrasi numerik Trapezoid
-subroutine integrasi(nx,fn,x,trapzSum)
+subroutine trapz(nx,fn,x,trapzSum)
   implicit none
   !input variabel
   integer :: nx
   double precision:: fn(nx),x(nx)
-  !internal variabel
+  !internal dan outputvariabel
   integer :: i
   double precision :: xmin,xmax,dx
-  !output variabel
   double precision :: trapzSum 
 
   xmin = x(1)
@@ -114,5 +148,31 @@ subroutine integrasi(nx,fn,x,trapzSum)
   trapzSum = trapzSum + fn(nx) / 2
   trapzSum = trapzSum * dx
   
-end subroutine integrasi
+end subroutine trapz
 
+subroutine simpson(nx,fn,x,simpsonSum)
+  implicit none
+  !input variabel
+  integer :: nx
+  double precision:: fn(nx),x(nx)
+  !internal dan outputvariabel
+  integer :: i
+  double precision :: xmin,xmax,dx
+  double precision :: simpsonSum
+
+  if (mod(nx,2).ne.1) then
+     write(*,*) "number of mesh data of x must be odd"
+  else
+     xmin = x(1)
+     xmax = x(nx)
+     dx = (xmax - xmin) / (nx - 1)
+  
+     simpsonSum = fn(1)
+     do i = 2,nx-3,2
+        simpsonSum = simpsonSum + fn(i) * 4.0 + fn(i+1) * 2.0
+     end do
+     simpsonSum = simpsonSum + fn(nx-1) * 4.0 + fn(nx)
+     simpsonSum = simpsonSum * dx / 3.d0
+  end if
+
+end subroutine simpson

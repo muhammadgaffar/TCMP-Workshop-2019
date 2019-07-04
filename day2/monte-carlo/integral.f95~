@@ -1,0 +1,13 @@
+program main
+
+  
+end program main
+
+function func(x) result(y)
+  implicit none
+  double precision, intent(in) 	:: x
+  double precision		:: y
+
+  y = 4 / (1 + x^2)
+  
+end function func
