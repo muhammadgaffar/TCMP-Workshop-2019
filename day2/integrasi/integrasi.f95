@@ -46,8 +46,8 @@ program main
     allocate(approxIntg(iData))
     allocate(error(iData))
 
-    xmin = 0.d0
-    xmax = 12.d0
+    xmin = -3.d0
+    xmax = 2.d0
     dx = (xmax - xmin) / (iData-1)
 
     do i = 1,iData
@@ -81,8 +81,8 @@ program main
     allocate(approxIntg(iData))
     allocate(error(iData))
 
-    xmin = 0.d0
-    xmax = 12.d0
+    xmin = -3.d0
+    xmax = 2.d0
     dx = (xmax - xmin) / (iData-1)
 
     do i = 1,iData
@@ -145,7 +145,7 @@ subroutine trapz(nx,fn,x,trapzSum)
   do i = 2,nx-1
      trapzSum = trapzSum + fn(i)
   end do
-  trapzSum = trapzSum + fn(nx) / 2
+  trapzSum = trapzSum + fn(nx) * 0.5
   trapzSum = trapzSum * dx
   
 end subroutine trapz
@@ -160,7 +160,7 @@ subroutine simpson(nx,fn,x,simpsonSum)
   double precision :: xmin,xmax,dx
   double precision :: simpsonSum
 
-  if (mod(nx,2).ne.1) then
+  if (mod(nx,2).ne.0) then
      write(*,*) "number of mesh data of x must be odd"
   else
      xmin = x(1)
